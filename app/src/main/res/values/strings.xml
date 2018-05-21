@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">QR-Attendance</string>
+    <string name="action_settings">Settings</string>
+    <string name="title_activity_login">Sign in</string>
+    <!-- Strings related to login -->
+    <string name="prompt_matr_nr">MatrNr</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_matrNr">This matriculation number is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_incorrect_login_data">This password or username is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+    <string name="permission_rationale">"Contacts permissions are needed for providing completions."</string>
+    <string name="not_logged_in">not logged in. use the login-button to sign in.</string>
+    <string name="action_logout">Logout</string>
+
+    <string name="title_activity_camera">QR-Scanner</string>
+    <string name="take_picture">Take picture</string>
+</resources>
