@@ -31,6 +31,8 @@ public class ActivityLogin extends AppCompatActivity {
 
     private static final String URL_LOGIN = "https://www.kusss.jku.at/kusss/login.action";
     private static final String LOGIN_FAILED = "KUSSS | Login gescheitert";
+    public static final String KEY_MATRNR = "MatrNr";
+    public static final String KEY_NAME = "Name";
     private UserLoginTask mAuthTask = null;
     private String parsedName = null;
 
@@ -220,8 +222,8 @@ public class ActivityLogin extends AppCompatActivity {
 
             if (success) {
                 Intent returnIntent = new Intent();
-                returnIntent.putExtra("MatrNr", mMatrNr);
-                returnIntent.putExtra("Name", parsedName);
+                returnIntent.putExtra(KEY_MATRNR, mMatrNr);
+                returnIntent.putExtra(KEY_NAME, parsedName);
                 setResult(RESULT_OK, returnIntent);
                 finish();
             } else {

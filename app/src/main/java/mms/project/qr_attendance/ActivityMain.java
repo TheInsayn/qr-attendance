@@ -16,6 +16,9 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import static mms.project.qr_attendance.ActivityLogin.KEY_MATRNR;
+import static mms.project.qr_attendance.ActivityLogin.KEY_NAME;
+
 public class ActivityMain extends AppCompatActivity {
     private static final int REQUEST_LOGIN = 1234;
     private static final int REQUEST_PICTURE = 5678;
@@ -43,9 +46,9 @@ public class ActivityMain extends AppCompatActivity {
             case REQUEST_LOGIN:
                 if (resultCode == RESULT_OK) {
                     Bundle bundle = data.getExtras();
-                    if (bundle != null && bundle.containsKey("MatrNr")) {
-                        matrNr = bundle.getString("MatrNr");
-                        name = bundle.getString("Name");
+                    if (bundle != null && bundle.containsKey(KEY_MATRNR)) {
+                        matrNr = bundle.getString(KEY_MATRNR);
+                        name = bundle.getString(KEY_NAME);
                         setAppState(true);
                     }
                 }
@@ -69,11 +72,11 @@ public class ActivityMain extends AppCompatActivity {
     private void setAppState(boolean logged_in) {
         TextView txt = findViewById(R.id.text_view);
         if (logged_in) {
-            txt.setText(String.format("Hallo, %s\nMatrNr: %s", name, matrNr));
+            txt.setText(String.format(getString(R.string.welcome_format), name, matrNr));
             fab.setImageResource(R.drawable.ic_scan);
             fab.setOnClickListener((v) -> takePicture());
         } else {
-            txt.setText("logged out.\nto sign in again, use login-button.");
+            txt.setText(R.string.logged_out);
             fab.setImageResource(R.drawable.ic_login);
             matrNr = null;
             name = null;

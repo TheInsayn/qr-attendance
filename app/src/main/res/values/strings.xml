@@ -18,4 +18,6 @@
 
     <string name="title_activity_camera">QR-Scanner</string>
     <string name="take_picture">Take picture</string>
+    <string name="logged_out">logged out. to sign in again, use login-button.</string>
+    <string name="welcome_format">Hallo, %s MatrNr: %s</string>
 </resources>
