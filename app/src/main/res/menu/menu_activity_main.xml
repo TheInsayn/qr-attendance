@@ -13,4 +13,10 @@
         android:title="@string/action_logout"
         app:showAsAction="ifRoom"
         android:visible="false"/>
+    <item
+        android:id="@+id/action_generate"
+        android:orderInCategory="50"
+        android:title="@string/action_generate"
+        app:showAsAction="ifRoom"
+        android:visible="false"/>
 </menu>

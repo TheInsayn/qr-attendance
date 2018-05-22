@@ -159,6 +159,7 @@ public class ActivityLogin extends AppCompatActivity {
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
+                String USER_AGENT = "Mozilla/5.0";
                 URL url = new URL(URL_LOGIN);
                 HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
                 conn.setInstanceFollowRedirects(true);
@@ -167,6 +168,8 @@ public class ActivityLogin extends AppCompatActivity {
                 conn.setRequestMethod("POST");
                 conn.setDoInput(true);
                 conn.setDoOutput(true);
+                conn.setRequestProperty("User-Agent", USER_AGENT);
+                conn.setRequestProperty("Accept-Language", "UTF-8");
 
                 Uri.Builder builder = new Uri.Builder()
                         .appendQueryParameter("j_username", mMatrNr)
@@ -179,9 +182,9 @@ public class ActivityLogin extends AppCompatActivity {
                 if (query != null)
                     writer.write(query);
                 writer.flush();
+                os.flush();
                 writer.close();
                 os.close();
-                conn.connect();
                 InputStream in = new BufferedInputStream(conn.getInputStream());
                 BufferedReader rd = new BufferedReader(new InputStreamReader(in));
                 String line;
