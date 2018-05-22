@@ -8,7 +8,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
@@ -34,7 +33,6 @@ public class ActivityLogin extends AppCompatActivity {
     public static final String KEY_MATRNR = "MatrNr";
     public static final String KEY_NAME = "Name";
     private UserLoginTask mAuthTask = null;
-    private String parsedName = null;
 
     // UI references
     private AutoCompleteTextView mMatrNrView;
@@ -195,27 +193,15 @@ public class ActivityLogin extends AppCompatActivity {
                 in.close();
                 rd.close();
                 String response = responseBuffer.toString();
-                Log.i("content", response);
                 if (response.contains(LOGIN_FAILED)) {
                     return false;
                 } else {
-                    String name = response.substring(response.indexOf("<title>") + 7, response.indexOf("</title>"));
-                    parsedName = name.trim();
                     return true;
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            // TODO: register the new account here.
-            return true;
+            return false;
         }
 
         @Override
@@ -226,7 +212,6 @@ public class ActivityLogin extends AppCompatActivity {
             if (success) {
                 Intent returnIntent = new Intent();
                 returnIntent.putExtra(KEY_MATRNR, mMatrNr);
-                returnIntent.putExtra(KEY_NAME, parsedName);
                 setResult(RESULT_OK, returnIntent);
                 finish();
             } else {

@@ -11,12 +11,18 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.google.zxing.BinaryBitmap;
+import com.google.zxing.MultiFormatReader;
+import com.google.zxing.NotFoundException;
+import com.google.zxing.RGBLuminanceSource;
+import com.google.zxing.common.HybridBinarizer;
+
 import static mms.project.qr_attendance.ActivityLogin.KEY_MATRNR;
-import static mms.project.qr_attendance.ActivityLogin.KEY_NAME;
 
 public class ActivityMain extends AppCompatActivity {
     private static final int REQUEST_LOGIN = 1234;
@@ -27,7 +33,6 @@ public class ActivityMain extends AppCompatActivity {
     private TextView txt;
 
     private static String matrNr = null;
-    private static String name;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +55,6 @@ public class ActivityMain extends AppCompatActivity {
                     Bundle bundle = data.getExtras();
                     if (bundle != null && bundle.containsKey(KEY_MATRNR)) {
                         matrNr = bundle.getString(KEY_MATRNR);
-                        name = bundle.getString(KEY_NAME);
                         setAppState(true);
                     }
                 }
@@ -58,8 +62,15 @@ public class ActivityMain extends AppCompatActivity {
             case REQUEST_PICTURE:
                 if (resultCode == RESULT_OK) {
                     Bundle extras = data.getExtras();
-                    Bitmap imageBitmap = (Bitmap) extras.get("data");
-                    processPicture(imageBitmap);
+                    String result = "no data";
+                    if (extras != null) {
+                        Bitmap imageBitmap = (Bitmap) extras.get("data");
+                        if (imageBitmap != null) {
+                            result = processPicture(imageBitmap);
+                        }
+                    }
+                    // TODO: send to server, as attendee of "LVANr; Date"
+                    Snackbar.make(txt, "parsed: " + result, Snackbar.LENGTH_LONG).show();
                 }
                 break;
         }
@@ -68,14 +79,13 @@ public class ActivityMain extends AppCompatActivity {
 
     private void setAppState(boolean logged_in) {
         if (logged_in) {
-            txt.setText(String.format(getString(R.string.welcome_format), name, matrNr));
+            txt.setText(String.format(getString(R.string.welcome_format), matrNr));
             fab.setImageResource(R.drawable.ic_scan);
             fab.setOnClickListener((v) -> takePicture());
         } else {
             txt.setText(R.string.logged_out);
             fab.setImageResource(R.drawable.ic_login);
             matrNr = null;
-            name = null;
             fab.setOnClickListener((v) -> startLoginActivity());
         }
         invalidateOptionsMenu();
@@ -95,6 +105,7 @@ public class ActivityMain extends AppCompatActivity {
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
         } else {
+
             Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
             if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
                 startActivityForResult(takePictureIntent, REQUEST_PICTURE);
@@ -115,9 +126,20 @@ public class ActivityMain extends AppCompatActivity {
         }
     }
 
-    private void processPicture(Bitmap imageBitmap) {
-        //TODO: scan image for qr code
-        Snackbar.make(txt, "image recieved, scan it now", Snackbar.LENGTH_LONG).show();
+    private String processPicture(Bitmap bitmap) {
+        int width = bitmap.getWidth(), height = bitmap.getHeight();
+        int[] pixels = new int[width * height];
+        bitmap.getPixels(pixels, 0, width, 0, 0, width, height);
+        bitmap.recycle();
+        RGBLuminanceSource source = new RGBLuminanceSource(width, height, pixels);
+        BinaryBitmap bBitmap = new BinaryBitmap(new HybridBinarizer(source));
+        MultiFormatReader reader = new MultiFormatReader();
+        try {
+            return reader.decode(bBitmap).toString();
+        } catch (NotFoundException e) {
+            Log.i("decode exception", e.toString());
+            return null;
+        }
     }
 
     @Override
@@ -139,7 +161,6 @@ public class ActivityMain extends AppCompatActivity {
             case R.id.action_settings:
                 Snackbar.make(txt, "Not yet implemented", Snackbar.LENGTH_LONG).show();
                 //TODO: remove (only used for faster testing)
-                name = "Username";
                 matrNr = "k12345678";
                 setAppState(true);
                 // TODO: till here

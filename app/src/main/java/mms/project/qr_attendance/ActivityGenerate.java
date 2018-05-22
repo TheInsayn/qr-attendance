@@ -3,6 +3,7 @@ package mms.project.qr_attendance;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.EditText;
@@ -89,11 +90,13 @@ public class ActivityGenerate extends AppCompatActivity {
     }
 
     private boolean refreshAttendees() {
+        Snackbar.make(btnGenerate, "Refreshing amount of scans", Snackbar.LENGTH_SHORT).show();
         //TODO: refresh amount of scans of QR code, save MatrNrs to list
         return true;
     }
 
     private boolean generateCSV() {
+        Snackbar.make(btnGenerate, "Generating CSV of attendees", Snackbar.LENGTH_SHORT).show();
         //TODO: generate csv-file out of list of successfully scanned students
         return true;
     }
