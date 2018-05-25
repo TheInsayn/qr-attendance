@@ -4,16 +4,28 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class ActivityGenerate extends AppCompatActivity {
 
@@ -23,10 +35,38 @@ public class ActivityGenerate extends AppCompatActivity {
     EditText txtDate;
     EditText txtAttendees;
     Button btnGenerate;
-    Button btnRefresh;
+    Button btnPresent;
     Button btnCSV;
     ImageView imageView;
     ProgressBar progress;
+
+    String lvaInstance;
+    List<String> attendees;
+
+    private final ValueEventListener valueListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            String value = dataSnapshot.getValue(String.class);
+            Log.d("Value is: ", value);
+            if (value != null) {
+                String[] valuePair = value.split("; ");
+                if (valuePair[0].equals(lvaInstance) && valuePair.length > 1) {
+                    attendees.add(valuePair[1]);
+                    Log.d("attendees", Arrays.toString(attendees.toArray()));
+                    progress.setProgress(attendees.size(), true);
+                    btnPresent.setText(
+                            String.format(getString(R.string.format_dialog_present),
+                            attendees.size(), progress.getMax()));
+
+                }
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError error) {
+            Log.w("Failed to read value.", error.toException());
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,14 +76,21 @@ public class ActivityGenerate extends AppCompatActivity {
         txtDate = findViewById(R.id.txtDate);
         txtAttendees = findViewById(R.id.txtAttendees);
         btnGenerate = findViewById(R.id.btn_generate);
-        btnRefresh = findViewById(R.id.btn_refresh);
+        btnPresent = findViewById(R.id.btn_present);
         btnCSV = findViewById(R.id.btn_csv);
         imageView = findViewById(R.id.imageView);
         progress = findViewById(R.id.progressBar);
 
         btnGenerate.setOnClickListener(v -> generateCode());
-        btnRefresh.setOnClickListener(v -> refreshAttendees());
         btnCSV.setOnClickListener(v -> generateCSV());
+        btnPresent.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Present:")
+                    .setMessage(TextUtils.join("\n", attendees))
+                    .show();
+        });
+
+        attendees = new ArrayList<>();
     }
 
     private boolean generateCode() {
@@ -53,7 +100,8 @@ public class ActivityGenerate extends AppCompatActivity {
         if (validData()) {
             String lva = txtLVA.getText().toString();
             String date = txtDate.getText().toString();
-            String qrString = lva + "; " + date;
+            int expectedAttendees = Integer.valueOf(txtAttendees.getText().toString());
+            String qrString = lva + "-" + date;
             try {
                 QRCodeWriter writer = new QRCodeWriter();
                 BitMatrix bm = writer.encode(qrString, BarcodeFormat.QR_CODE, QR_SIZE, QR_SIZE);
@@ -67,6 +115,12 @@ public class ActivityGenerate extends AppCompatActivity {
             } catch (WriterException e) {
                 e.printStackTrace();
             }
+            this.lvaInstance = qrString;
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            DatabaseReference ref = database.getReference();
+            ref.setValue("");
+            ref.addValueEventListener(valueListener);
+            progress.setMax(expectedAttendees);
             return true;
         }
         return false;
@@ -87,12 +141,6 @@ public class ActivityGenerate extends AppCompatActivity {
             valid = false;
         }
         return valid;
-    }
-
-    private boolean refreshAttendees() {
-        Snackbar.make(btnGenerate, "Refreshing amount of scans", Snackbar.LENGTH_SHORT).show();
-        //TODO: refresh amount of scans of QR code, save MatrNrs to list
-        return true;
     }
 
     private boolean generateCSV() {

@@ -16,11 +16,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.zxing.BinaryBitmap;
 import com.google.zxing.MultiFormatReader;
 import com.google.zxing.NotFoundException;
 import com.google.zxing.RGBLuminanceSource;
 import com.google.zxing.common.HybridBinarizer;
+
+import java.util.Random;
 
 import static mms.project.qr_attendance.ActivityLogin.KEY_MATRNR;
 
@@ -45,6 +50,7 @@ public class ActivityMain extends AppCompatActivity {
             fab.setOnClickListener(v -> startLoginActivity());
         }
         txt = findViewById(R.id.text_view);
+        FirebaseApp.initializeApp(this);
     }
 
     @Override
@@ -69,7 +75,10 @@ public class ActivityMain extends AppCompatActivity {
                             result = processPicture(imageBitmap);
                         }
                     }
-                    // TODO: send to server, as attendee of "LVANr; Date"
+
+                    FirebaseDatabase database = FirebaseDatabase.getInstance();
+                    DatabaseReference ref = database.getReference();
+                    ref.setValue(result + "; " + matrNr);
                     Snackbar.make(txt, "parsed: " + result, Snackbar.LENGTH_LONG).show();
                 }
                 break;
@@ -161,7 +170,7 @@ public class ActivityMain extends AppCompatActivity {
             case R.id.action_settings:
                 Snackbar.make(txt, "Not yet implemented", Snackbar.LENGTH_LONG).show();
                 //TODO: remove (only used for faster testing)
-                matrNr = "k12345678";
+                matrNr = "k" + new Random().nextInt(99999999);
                 setAppState(true);
                 // TODO: till here
                 return true;

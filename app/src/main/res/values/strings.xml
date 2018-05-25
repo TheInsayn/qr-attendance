@@ -22,10 +22,11 @@
     <string name="logged_out">logged out. \nto sign in again, use login-button.</string>
     <string name="welcome_format">Hello: %s \npress scan-button to scan qr-code.</string>
     <string name="action_generate">Generate QR-Code</string>
-    <string name="btn_refresh">Refresh</string>
+    <string name="check_present">Present</string>
     <string name="btn_csv">CSV</string>
     <string name="btn_generate">Generate</string>
     <string name="hint_attendees">expected attendees</string>
     <string name="hint_date">Date</string>
     <string name="hint_lva">LVANr</string>
+    <string name="format_dialog_present">Present: %d / %d</string>
 </resources>
