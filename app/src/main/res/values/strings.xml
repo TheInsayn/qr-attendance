@@ -6,7 +6,7 @@
     <!-- Strings related to login -->
     <string name="prompt_matr_nr">MatrNr</string>
     <string name="prompt_password">Password</string>
-    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in">Sign in</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="error_invalid_matrNr">This matriculation number is invalid</string>
     <string name="error_invalid_password">This password is too short</string>
@@ -23,7 +23,7 @@
     <string name="welcome_format">Hello: %s \npress scan-button to scan qr-code.</string>
     <string name="action_generate">Generate QR-Code</string>
     <string name="check_present">Present</string>
-    <string name="btn_csv">CSV</string>
+    <string name="btn_export">Export</string>
     <string name="btn_generate">Generate</string>
     <string name="hint_attendees">expected attendees</string>
     <string name="hint_date">Date</string>

@@ -75,7 +75,7 @@ public class ActivityMain extends AppCompatActivity {
                             result = processPicture(imageBitmap);
                         }
                     }
-
+                    // send my matriculation number to DB (notifying that i am present)
                     FirebaseDatabase database = FirebaseDatabase.getInstance();
                     DatabaseReference ref = database.getReference();
                     ref.setValue(result + "; " + matrNr);
@@ -86,6 +86,7 @@ public class ActivityMain extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    /** update texts and buttons*/
     private void setAppState(boolean logged_in) {
         if (logged_in) {
             txt.setText(String.format(getString(R.string.welcome_format), matrNr));
@@ -100,16 +101,19 @@ public class ActivityMain extends AppCompatActivity {
         invalidateOptionsMenu();
     }
 
+    /** go to login form for KUSSS*/
     private void startLoginActivity() {
         Intent loginIntent = new Intent(getApplicationContext(), ActivityLogin.class);
         startActivityForResult(loginIntent, REQUEST_LOGIN);
     }
 
+    /** go to generate activity */
     private void startGenerateActivity() {
         Intent generateIntent = new Intent(getApplicationContext(), ActivityGenerate.class);
         startActivity(generateIntent);
     }
 
+    /** start a camera-activity to make picture of qr-code*/
     private void takePicture() {
         if (checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA);
@@ -135,6 +139,7 @@ public class ActivityMain extends AppCompatActivity {
         }
     }
 
+    /** helper-function to decode QR-image and get text*/
     private String processPicture(Bitmap bitmap) {
         int width = bitmap.getWidth(), height = bitmap.getHeight();
         int[] pixels = new int[width * height];

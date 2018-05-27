@@ -108,7 +108,7 @@ public class ActivityLogin extends AppCompatActivity {
     }
 
     private boolean isMatrNrValid(String matrNr) {
-        return matrNr.matches("^k[0-9]+");
+        return matrNr.matches("^k[0-9]{8}");
     }
 
     private boolean isPasswordValid(String password) {
@@ -154,6 +154,7 @@ public class ActivityLogin extends AppCompatActivity {
             mPassword = password;
         }
 
+        /** attempt to login to KUSSS, return matrNr if successful, otherwise: retry*/
         @Override
         protected Boolean doInBackground(Void... params) {
             try {

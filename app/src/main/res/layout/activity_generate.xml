@@ -66,16 +66,16 @@
         android:layout_marginBottom="@dimen/activity_vertical_margin"
         android:text="@string/check_present"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/btn_csv"
+        app:layout_constraintEnd_toStartOf="@+id/btn_export"
         app:layout_constraintStart_toEndOf="@+id/btn_generate" />
 
     <Button
-        android:id="@+id/btn_csv"
+        android:id="@+id/btn_export"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/activity_horizontal_margin"
         android:layout_marginBottom="@dimen/activity_vertical_margin"
-        android:text="@string/btn_csv"
+        android:text="@string/btn_export"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

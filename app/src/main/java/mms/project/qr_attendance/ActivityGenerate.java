@@ -1,5 +1,6 @@
 package mms.project.qr_attendance;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -36,13 +37,16 @@ public class ActivityGenerate extends AppCompatActivity {
     EditText txtAttendees;
     Button btnGenerate;
     Button btnPresent;
-    Button btnCSV;
+    Button btnExport;
     ImageView imageView;
     ProgressBar progress;
 
     String lvaInstance;
     List<String> attendees;
+    String lvaNr;
+    String date;
 
+    // value listener for Firebase DB-connection
     private final ValueEventListener valueListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -56,7 +60,7 @@ public class ActivityGenerate extends AppCompatActivity {
                     progress.setProgress(attendees.size(), true);
                     btnPresent.setText(
                             String.format(getString(R.string.format_dialog_present),
-                            attendees.size(), progress.getMax()));
+                                    attendees.size(), progress.getMax()));
 
                 }
             }
@@ -77,12 +81,12 @@ public class ActivityGenerate extends AppCompatActivity {
         txtAttendees = findViewById(R.id.txtAttendees);
         btnGenerate = findViewById(R.id.btn_generate);
         btnPresent = findViewById(R.id.btn_present);
-        btnCSV = findViewById(R.id.btn_csv);
+        btnExport = findViewById(R.id.btn_export);
         imageView = findViewById(R.id.imageView);
         progress = findViewById(R.id.progressBar);
 
         btnGenerate.setOnClickListener(v -> generateCode());
-        btnCSV.setOnClickListener(v -> generateCSV());
+        btnExport.setOnClickListener(v -> exportList());
         btnPresent.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle("Present:")
@@ -93,15 +97,13 @@ public class ActivityGenerate extends AppCompatActivity {
         attendees = new ArrayList<>();
     }
 
+    /** generate qr-code, replace it as content of imageView, initialize DB listener*/
     private boolean generateCode() {
-//        if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-//            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_STORAGE);
-//        }
         if (validData()) {
-            String lva = txtLVA.getText().toString();
-            String date = txtDate.getText().toString();
+            lvaNr = txtLVA.getText().toString();
+            date = txtDate.getText().toString();
             int expectedAttendees = Integer.valueOf(txtAttendees.getText().toString());
-            String qrString = lva + "-" + date;
+            String qrString = lvaNr + "-" + date;
             try {
                 QRCodeWriter writer = new QRCodeWriter();
                 BitMatrix bm = writer.encode(qrString, BarcodeFormat.QR_CODE, QR_SIZE, QR_SIZE);
@@ -126,6 +128,7 @@ public class ActivityGenerate extends AppCompatActivity {
         return false;
     }
 
+    /** helper function, to check whether fields have valid data in them*/
     private boolean validData() {
         boolean valid = true;
         if (!txtLVA.getText().toString().matches("^[0-9]{3}\\.[0-9]{3}")) {
@@ -143,9 +146,21 @@ public class ActivityGenerate extends AppCompatActivity {
         return valid;
     }
 
-    private boolean generateCSV() {
-        Snackbar.make(btnGenerate, "Generating CSV of attendees", Snackbar.LENGTH_SHORT).show();
-        //TODO: generate csv-file out of list of successfully scanned students
+    /** export a list of students which are present to a list and share it*/
+    private boolean exportList() {
+        if (attendees.size() > 0) {
+            StringBuilder attendeeStr = new StringBuilder(lvaNr + "-" + date + ":\n");
+            attendeeStr.append(attendees.get(0));
+            for (int i = 1; i < attendees.size(); i++) {
+                attendeeStr.append(",\n").append(attendees.get(i));
+            }
+            Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+            sharingIntent.putExtra(Intent.EXTRA_TEXT, attendeeStr.toString());
+            sharingIntent.setType("text/plain");
+            startActivity(Intent.createChooser(sharingIntent, "save or send list"));
+        } else {
+            Snackbar.make(btnGenerate, "nobody is present yet", Snackbar.LENGTH_SHORT).show();
+        }
         return true;
     }
 }
